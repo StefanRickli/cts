@@ -8,7 +8,7 @@ import console_utils
 import logging
 
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 base_path = 'chart_html/'
 
 
@@ -71,28 +71,28 @@ def compile_set(from_year, from_week, to_year, to_week):
                 ind = (ind + 1) % 5
                 n_items_left = n_items - i - 1
                 time_left = n_items_left * sum(ts) / min(i + 1, 10)
-                print('\r{:03}/{:03}: Added {} to set. ~{:.0f}s left.'.format(i + 1, n_items, chartnumber, time_left), end='')
+                logging.debug('{:03}/{:03}: Added {} to set. ~{:.0f}s left.'.format(i + 1, n_items, chartnumber, time_left))
         except:
             pass
-    print()
 
     return compilation
 
 
 def chart_difference(base_from_year, base_from_week, base_to_year, base_to_week, compare_from_year, compare_from_week, compare_to_year, compare_to_week):
-    print('Preparing base set.')
+    logging.debug('Preparing base set.')
     base_set = compile_set(base_from_year, base_from_week, base_to_year, base_to_week)
     if not base_set:
-        print('Base set is empty.')
+        logging.debug('Base set is empty.')
 
-    print('Preparing comparison set.')
+    logging.debug('Preparing comparison set.')
     compare_set = compile_set(compare_from_year, compare_from_week, compare_to_year, compare_to_week)
     if not compare_set:
-        print('Comparison set is empty.')
+        logging.debug('Comparison set is empty.')
 
     # Remove all elements from the comparison-set that have already been seen in the base-set
     result = compare_set - base_set
-    print('There are {} new songs in total.'.format(len(result)))
+    
+    logging.info('Set comparison revealed {} new songs in total.'.format(len(result)))
     return result
 
 
@@ -109,7 +109,7 @@ def get_charts_difference(base_from_year, base_from_week, base_to_year, base_to_
     if sort_by == 'dance_style':
         return sorted(new_songs, key=lambda x : x[2])
 
-    print('Done.')
+    logging.debug('Done.')
 
 
 def write_result(result):
@@ -123,6 +123,7 @@ def write_result(result):
         for i, song in enumerate(new_songs_by_artist):
             f.write('{}\t{}\t{}\t{}\n'.format(song[0], song[1], song[2], song[3]))
 
+    logging.info('Wrote result to files.')
     return result
 
 
