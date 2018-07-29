@@ -1,6 +1,6 @@
 import numpy as np
 from bs4 import BeautifulSoup
-from tanzmusik_online_get_charts import get_chartnumbers
+from tmo_scrape_charts import get_chartnumbers
 import time
 from pathlib import Path
 import pickle
@@ -97,7 +97,8 @@ def chart_difference(base_from_year, base_from_week, base_to_year, base_to_week,
 
 
 def get_charts_difference(base_from_year, base_from_week, base_to_year, base_to_week, compare_from_year, compare_from_week, compare_to_year, compare_to_week, sort_by='artist'):
-    
+    assert(sort_by in ['artist', 'title', 'dance_style'])
+
     new_songs = list(chart_difference(base_from_year, base_from_week, base_to_year, base_to_week, compare_from_year, compare_from_week, compare_to_year, compare_to_week))
 
     if sort_by == 'artist':
