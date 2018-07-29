@@ -82,12 +82,12 @@ def chart_difference(base_from_year, base_from_week, base_to_year, base_to_week,
     logging.debug('Preparing base set.')
     base_set = compile_set(base_from_year, base_from_week, base_to_year, base_to_week)
     if not base_set:
-        logging.debug('Base set is empty.')
+        logging.info('Base set is empty.')
 
     logging.debug('Preparing comparison set.')
     compare_set = compile_set(compare_from_year, compare_from_week, compare_to_year, compare_to_week)
     if not compare_set:
-        logging.debug('Comparison set is empty.')
+        logging.info('Comparison set is empty.')
 
     # Remove all elements from the comparison-set that have already been seen in the base-set
     result = compare_set - base_set
