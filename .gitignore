@@ -1,8 +1,10 @@
 ## Custom Ignores:
 # Spotify App Data
 app_data.py
-# Pickle Files
+
+# Data Files
 *.pkl
+*.yaml
 
 # Spotipy Cache
 .cache*
