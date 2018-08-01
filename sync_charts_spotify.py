@@ -183,14 +183,6 @@ def main_screen(screen):
             target_playlist = 'asdf'
             draw_spotify_dataset(screen, spotify_current_song, target_playlist, items_offset, n_items, tpm)
 
-            #screen.print_at('[{}] {} - {}'.format(tmo_dance_style, tmo_artist, tmo_title), 0, 0)
-            # if song_found:
-            #     screen.print_at('Spotify: {} - {} [{}/{}]'.format(sp_tmo_artist, sp_tmo_title, items_offset + 1, n_items), 0, 1)
-            # else:
-            #     screen.print_at('Spotify: no results', 0, 1)
-
-            #update_tpm(screen, tpm)
-
             screen.print_at('{:10}{:10}{:10}{:10}{:10}{:10}{:10}{:10} '.format('(a)dd', '(q)uit', '(s)kip', '(p)lay', '(i) prev', '(o) next', '(u) pause', '(t)ap'), 0, screen.height - 2)
             screen.print_at('{:10}{:10}{:10}{:10} '.format('(j) artist -word', '(k) artist -char', '(l) title -word', '(m) title -char'), 0, screen.height - 1)
             
