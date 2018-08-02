@@ -8,7 +8,6 @@ import console_utils
 import logging
 
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 base_path = 'chart_html/'
 
 
@@ -129,6 +128,8 @@ def write_result(result):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
     base_from_year = 2008
     base_from_week = 20
     base_to_year = 2010
