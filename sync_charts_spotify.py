@@ -5,6 +5,7 @@ from time import sleep
 from trimmable_string import TrimmableString
 from spotipy_interface import sp_login, sp_find, sp_play, sp_pause_resume, sp_skip, sp_seek
 import tap_tempo
+import yaml
 import logging
 
 def sleep_ms(t):
@@ -34,6 +35,12 @@ tpm_y = title_y + 1
 target_playlist_y = tpm_y + 1
 arrow_width = 7
 spotify_x = border_x + heading_width_tmo + dataset_width_tmo + arrow_width
+
+with open('dance_style_mapping.yaml', 'r') as f:
+    tmo_spotify_dance_style_mapping = yaml.load(f)
+
+with open('spotify_playlist_export.yaml', 'r') as f:
+    spotify_playlist_mapping = yaml.load(f)
 
 new_songs = tmo_processing.get_charts_difference(base_from_year, 
                                                  base_from_week, 
@@ -158,6 +165,23 @@ def draw_tpm(screen, tpm, bg = 0):
 def draw_spotify_target_playlist(screen, target_playlist, bg = 0):
     s = '{{:{}}}'.format(dataset_width_tmo)
     screen.print_at(s.format(str(target_playlist)), spotify_x + heading_width_spotify, target_playlist_y, bg = bg)
+
+
+def get_target_playlist_obj(spotify_current_song, tpm, tmo_dance_style):
+    target_playlist_obj = None
+    if spotify_current_song is not None and tpm.valid_tpm():
+        target_playlist_obj = spotify_playlist_mapping.get(tmo_spotify_dance_style_mapping.get(str(tmo_dance_style), None), {}).get(math.floor(float(tpm.get_tpm())), None)
+
+    return target_playlist_obj
+
+
+def get_target_playlist_name(spotify_current_song, tpm, tmo_dance_style):
+    target_playlist_name = ''
+    target_playlist_obj = get_target_playlist_obj(spotify_current_song, tpm, tmo_dance_style)
+    if target_playlist_obj is not None:
+        target_playlist_name = target_playlist_obj['name']
+
+    return target_playlist_name
 
 
 def main_screen(screen):
