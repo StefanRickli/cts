@@ -5,6 +5,7 @@ from time import sleep
 from trimmable_string import TrimmableString
 from spotipy_interface import sp_login, sp_find, sp_play, sp_pause_resume, sp_skip, sp_seek
 import tap_tempo
+import logging
 
 def sleep_ms(t):
     sleep(t/1000)
@@ -252,11 +253,11 @@ def main_screen(screen):
             if key_code in (ord('é'), ord('ö'), ord('Ö')):
                 tmo_title.reveal_char()
 
-sp_login()
-Screen.wrapper(main_screen)
 
 if __name__ == '__main__':
-    pass    
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
+    sp_login()
+    Screen.wrapper(main_screen)
 
 
-        
