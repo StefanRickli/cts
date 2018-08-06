@@ -3,14 +3,16 @@ import spotipy
 import spotipy.util as util
 import urllib.parse
 import app_data
+import logging
 
-scope = 'user-library-read user-read-playback-state user-modify-playback-state'
+scope = 'user-library-read user-read-playback-state user-modify-playback-state playlist-modify-public playlist-modify-private'
 
 username = app_data.username()
 
 client_id = app_data.client_id()
 client_secret = app_data.client_secret()
 redirect_uri = app_data.redirect_url()
+
 
 def get_authenticated_spotify():
     token = util.prompt_for_user_token(username, scope, client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri)
@@ -19,8 +21,16 @@ def get_authenticated_spotify():
     else:
         raise("Can't get token for {}".format(username))
 
+
 def sp_login():
     util.prompt_for_user_token(username, scope, client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri)
+
+def sp_add(song, playlist):
+    sp = get_authenticated_spotify()
+
+    response = sp.user_playlist_add_tracks(username, playlist['uri'], [song['uri']])
+    logging.debug('sp_add: Spotify Response: {}'.format(response))
+
 
 def sp_find(song_artist, song_title):
     sp = get_authenticated_spotify()
