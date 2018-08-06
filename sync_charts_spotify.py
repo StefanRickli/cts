@@ -167,6 +167,15 @@ def draw_spotify_target_playlist(screen, target_playlist, bg = 0):
     screen.print_at(s.format(str(target_playlist)), spotify_x + heading_width_spotify, target_playlist_y, bg = bg)
 
 
+def draw_error(screen, msg):
+    error_x = math.floor(screen.width / 2) - 40
+    error_y = math.floor(screen.height / 2) + 3
+    if msg == '':
+        screen.print_at('{}'.format(msg).ljust(40, ' '), error_x, error_y)
+    else:
+        screen.print_at('{}'.format(msg).ljust(40, ' '), error_x, error_y, bg = Screen.COLOUR_RED)
+
+
 def get_target_playlist_obj(spotify_current_song, tpm, tmo_dance_style):
     target_playlist_obj = None
     if spotify_current_song is not None and tpm.valid_tpm():
@@ -199,6 +208,7 @@ def main_screen(screen):
             spotify_current_song = items[items_offset]
         tpm = init_tpm()
 
+        error_text = ''
         goto_next_song = False
         while not goto_next_song:
             screen.clear()
@@ -211,17 +221,22 @@ def main_screen(screen):
             screen.print_at('{:10}{:10}{:10}{:10}{:10}{:10}{:10}{:10} '.format('(a)dd', '(q)uit', '(s)kip', '(p)lay', '(i) prev', '(o) next', '(u) pause', '(t)ap'), 0, screen.height - 2)
             screen.print_at('{:10}{:10}{:10}{:10} '.format('(j) artist -word', '(k) artist -char', '(l) title -word', '(m) title -char'), 0, screen.height - 1)
             
+            draw_error(screen, error_text)
+
             screen.refresh()
             
             key_code = get_key_blocking(screen)
             
+            error_text = ''
             if key_code in (ord('A'), ord('a')):
                 if spotify_current_song is None:
-                    screen.print_at('ERROR: Find suitable song first!')
+                    error_text = 'ERROR: Find suitable song first!'
                 elif not tpm.valid_tpm():
-                    screen.print_at('ERROR: Tap tempo first!')
+                    error_text = 'ERROR: Tap tempo first!'
+                elif target_playlist_name == '':
+                    error_text = 'ERROR: no suitable playlist'
                 else:
-                    sp_add(items[items_offset]['uri'], tmo_dance_style, tpm.get_tpm)
+                    sp_add(spotify_current_song, get_target_playlist_obj(spotify_current_song, tpm, tmo_dance_style))
 
                     
 
