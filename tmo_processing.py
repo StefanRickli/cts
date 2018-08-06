@@ -4,7 +4,6 @@ from tmo_scrape_charts import get_chartnumbers
 import time
 from pathlib import Path
 import pickle
-import console_utils
 import logging
 
 
