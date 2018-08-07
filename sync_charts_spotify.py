@@ -3,9 +3,10 @@ import sys
 from asciimatics.screen import Screen
 from time import sleep
 from trimmable_string import TrimmableString
-from spotipy_interface import sp_login, sp_find, sp_play, sp_pause_resume, sp_skip, sp_seek
+from spotipy_interface import sp_login, sp_find, sp_play, sp_pause_resume, sp_skip, sp_seek, sp_add
 import tap_tempo
 import yaml
+import math
 import logging
 
 def sleep_ms(t):
@@ -51,7 +52,7 @@ new_songs = tmo_processing.get_charts_difference(base_from_year,
                                                  new_to_year, 
                                                  new_to_week,
                                                  sort_by='artist')
-
+tmo_n_items = len(new_songs)
 
 def get_key_blocking(screen):
     no_input = True
@@ -85,15 +86,15 @@ def tpm_screen(screen, tpm):
         else:
             tpm.tap()
 
-def draw_tmo_dataset(screen, tmo_artist, tmo_title, tmo_dance_style):
-    draw_tmo_headings(screen)
+def draw_tmo_dataset(screen, tmo_item_index, tmo_n_items, tmo_artist, tmo_title, tmo_dance_style):
+    draw_tmo_headings(screen, tmo_item_index, tmo_n_items)
     draw_tmo_artist(screen, tmo_artist)
     draw_tmo_title(screen, tmo_title)
     draw_tmo_dance_style(screen, tmo_dance_style)
 
 
-def draw_tmo_headings(screen):
-    screen.print_at('--- TM Online ---', border_x, heading_y)
+def draw_tmo_headings(screen, tmo_item_index, tmo_n_items):
+    screen.print_at('--- TM Online [{}/{}] ---'.format(tmo_item_index, tmo_n_items), border_x, heading_y)
     screen.print_at('Artist:', border_x, artist_y)
     screen.print_at('Title:', border_x, title_y)
     screen.print_at('Dance Style:', border_x, dance_style_y)
@@ -119,16 +120,16 @@ def draw_mapping_arrow(screen):
 
 
 
-def draw_spotify_dataset(screen, spotify_current_song, spotify_target_playlist, offset, n_items, tpm):
+def draw_spotify_dataset(screen, spotify_item_index, spotify_n_items, spotify_current_song, spotify_target_playlist, tpm):
 
     if spotify_current_song is None:
-        draw_spotify_headings(screen, -1, 0, tpm)
+        draw_spotify_headings(screen, 0, 0, tpm)
         draw_spotify_artist(screen, '')
         draw_spotify_title(screen, '')
         draw_tpm(screen, tpm)
         draw_spotify_target_playlist(screen, '')
     else:
-        draw_spotify_headings(screen, offset, n_items, tpm)
+        draw_spotify_headings(screen, spotify_item_index, spotify_n_items, tpm)
         title = spotify_current_song['name']
         artist = spotify_current_song['artists'][0]['name']
         draw_spotify_artist(screen, artist)
@@ -140,8 +141,8 @@ def draw_spotify_dataset(screen, spotify_current_song, spotify_target_playlist, 
             draw_spotify_target_playlist(screen, 'missing TPM')
 
 
-def draw_spotify_headings(screen, offset, n_items, tpm):
-    screen.print_at('--- SPOTIFY [{}/{}] ---'.format(offset + 1, n_items), spotify_x, heading_y)
+def draw_spotify_headings(screen, spotify_item_index, spotify_n_items, tpm):
+    screen.print_at('--- SPOTIFY [{}/{}] ---'.format(spotify_item_index, spotify_n_items), spotify_x, heading_y)
     screen.print_at('Artist:', spotify_x, artist_y)
     screen.print_at('Title:', spotify_x, title_y)
     screen.print_at('--> Playlist:', spotify_x, target_playlist_y)
@@ -193,19 +194,25 @@ def get_target_playlist_name(spotify_current_song, tpm, tmo_dance_style):
     return target_playlist_name
 
 
+def draw_data_once(screen, tmo_item_offset, tmo_n_items, tmo_artist, tmo_title, tmo_dance_style, spotify_items_offset, spotify_n_items, spotify_current_song, target_playlist_name, tpm):
+    draw_tmo_dataset(screen, tmo_item_offset + 1, tmo_n_items, tmo_artist, tmo_title, tmo_dance_style)
+    draw_spotify_dataset(screen, spotify_items_offset + 1, spotify_n_items, spotify_current_song, target_playlist_name, tpm)
+
+
+
 def main_screen(screen):
-    for song in new_songs:
+    for tmo_item_offset, song in enumerate(new_songs):
         tmo_dance_style = song[2]
         tmo_artist = TrimmableString(song[0])
         tmo_title = TrimmableString(song[1])
 
         spotify_current_song = None
-        n_items = 0
-        items_offset = 0
+        spotify_n_items = 0
+        spotify_items_offset = 0
         items = sp_find(tmo_artist, tmo_title)
         if items is not None:
-            n_items = len(items)
-            spotify_current_song = items[items_offset]
+            spotify_n_items = len(items)
+            spotify_current_song = items[spotify_items_offset]
         tpm = init_tpm()
 
         error_text = ''
@@ -213,10 +220,8 @@ def main_screen(screen):
         while not goto_next_song:
             screen.clear()
 
-            draw_tmo_dataset(screen, tmo_artist, tmo_title, tmo_dance_style)
-
-            target_playlist = 'asdf'
-            draw_spotify_dataset(screen, spotify_current_song, target_playlist, items_offset, n_items, tpm)
+            target_playlist_name = get_target_playlist_name(spotify_current_song, tpm, tmo_dance_style)
+            draw_data_once(screen, tmo_item_offset, tmo_n_items, tmo_artist, tmo_title, tmo_dance_style, spotify_items_offset, spotify_n_items, spotify_current_song, target_playlist_name, tpm)
 
             screen.print_at('{:10}{:10}{:10}{:10}{:10}{:10}{:10}{:10} '.format('(a)dd', '(q)uit', '(s)kip', '(p)lay', '(i) prev', '(o) next', '(u) pause', '(t)ap'), 0, screen.height - 2)
             screen.print_at('{:10}{:10}{:10}{:10} '.format('(j) artist -word', '(k) artist -char', '(l) title -word', '(m) title -char'), 0, screen.height - 1)
@@ -248,24 +253,24 @@ def main_screen(screen):
             if key_code in (ord('F'), ord('f')):
                 items = sp_find(tmo_artist, tmo_title)
                 if items is not None:
-                    n_items = len(items)
-                    items_offset = 0
-                    spotify_current_song = items[items_offset]
+                    spotify_n_items = len(items)
+                    spotify_items_offset = 0
+                    spotify_current_song = items[spotify_items_offset]
                 else:
                     spotify_current_song = None
             if key_code in (ord('P'), ord('p')):
                 if spotify_current_song is not None:
-                    sp_play(items, items_offset)
+                    sp_play(items, spotify_items_offset)
             if key_code == ord('i'):
-                if items_offset != 0:
+                if spotify_items_offset != 0:
                     sp_skip(-1)
-                    items_offset -= 1
+                    spotify_items_offset -= 1
             if key_code == ord('I'):
                 sp_seek(-1)
             if key_code == ord('o'):
-                if items_offset != n_items - 1:
+                if spotify_items_offset != spotify_n_items - 1:
                     sp_skip(1)
-                    items_offset += 1
+                    spotify_items_offset += 1
             if key_code == ord('O'):
                 sp_seek(1)
             if key_code in (ord('U'), ord('u')):
