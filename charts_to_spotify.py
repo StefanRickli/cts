@@ -29,11 +29,16 @@ def pre_gui():
     return spotify
 
 
-def gui_launcher(screen):
-    pass
+class GuiLauncher:
+    def __init__(self):
+        self.screen = None
+        self.spotify = None
+
+    def go(self, screen):
+        self.screen = screen
 
 
-class chart_choice:
+class ChartsChoice:
     def __init__(self):
         pass
 
@@ -41,7 +46,7 @@ class chart_choice:
         pass
 
 
-class main_menu:
+class MainMenu:
     def __init__(self, spotify, charts_items):
         self.charts_items = charts_items
         self.sp = spotify
@@ -56,6 +61,8 @@ class main_menu:
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-    spotify = pre_gui()
-    
-    Screen.wrapper(gui_launcher)
+    spotipy_wrapper_handle = pre_gui()
+    launcher = GuiLauncher()
+    launcher.spotify = spotipy_wrapper_handle
+
+    Screen.wrapper(launcher.go)
