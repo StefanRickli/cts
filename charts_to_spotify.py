@@ -8,8 +8,13 @@ from spotipy_wrapper import SpotipyWrapper, TimeoutError, NoActiveDeviceError, W
 from requests import ConnectionError
 import spotipy_interface
 import app_data
+import app_config
+
+config = {}
 
 def pre_gui():
+    config = app_config.get_config()
+
     spotify = SpotipyWrapper(app_data.username())
     
     login_succeeded = False
@@ -66,3 +71,5 @@ if __name__ == '__main__':
     launcher.spotify = spotipy_wrapper_handle
 
     Screen.wrapper(launcher.go)
+
+    app_config.save_config(config)
