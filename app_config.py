@@ -3,8 +3,15 @@ import os
 import yaml
 import logging
 import collections
+import app_data
 
 #######################################################################
+
+#########
+# Login #
+#########
+
+username = app_data.username()
 
 ##########
 # Charts #

@@ -14,7 +14,7 @@ config = {}
 
 def pre_gui():
 
-    spotify = SpotipyWrapper(app_data.username())
+    spotify = SpotipyWrapper(config['username'])
     
     login_succeeded = False
     while not login_succeeded:
