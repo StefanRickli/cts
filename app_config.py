@@ -122,7 +122,7 @@ class ConfigDict(collections.MutableMapping):
     def to_dict(self):
         return self.store
 
-def get_config(path = './settings.cfg'):
+def load_config(path = './settings.cfg'):
     if os.path.exists(path):
         with open(path, 'r') as f:
             try:
