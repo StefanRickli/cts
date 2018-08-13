@@ -82,13 +82,14 @@ def get_config(path = './settings.cfg'):
         with open(path, 'r') as f:
             try:
                 config = json.load(f)
+                logging.debug("get_config: restored saved config from '{}'".format(path))
                 return config
             except json.JSONDecodeError as e:
                 logging.warning('get_config: JSON.load encountered a decoding error:')
                 logging.warning(str(e))
                 logging.warning('get_config: Loading defaults.')
     else:
-        logging.warning("get_config: settings file didn't exist at path '{}. Loading defaults.".format(path))
+        logging.warning("get_config: settings file didn't exist at path '{}'. Loading defaults.".format(path))
 
     return default_config
 
@@ -96,6 +97,7 @@ def save_config(config, path = './settings.cfg'):
     try:
         with open(path, 'w') as f:
             json.dump(config, f)
+            logging.debug("save_config: wrote current config to '{}'".format(path))
     except Exception as e:
-        logging.warning("save_config: caught exception. Couldn't write to file {}".format(path))
+        logging.warning("save_config: caught exception. Couldn't write to file '{}'".format(path))
         logging.warning(str(e))
