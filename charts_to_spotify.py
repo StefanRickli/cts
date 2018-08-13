@@ -13,7 +13,6 @@ import app_config
 config = {}
 
 def pre_gui():
-    config = app_config.get_config()
 
     spotify = SpotipyWrapper(app_data.username())
     
@@ -65,6 +64,7 @@ class MainMenu:
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+    config = app_config.get_config()
 
     spotipy_wrapper_handle = pre_gui()
     launcher = GuiLauncher()
