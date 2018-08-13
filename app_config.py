@@ -142,9 +142,9 @@ def load_config(path = './settings.cfg', load_defaults = False):
 
     return ConfigDict(default_config)
 
-def save_config(config, path = './settings.cfg', skip = False):
-    if skip:
-        logging.info('save_config: Skip requested.')
+def save_config(config, path = './settings.cfg', skip_write = False):
+    if skip_write:
+        logging.info('save_config: Skip writing of config file requested.')
         return
     
     try:
