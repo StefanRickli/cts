@@ -69,7 +69,7 @@ class MainMenu:
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-    config = app_config.load_config()
+    config = app_config.load_config(load_defaults = True)
 
     spotipy_wrapper_handle = pre_gui()
     launcher = GuiLauncher()
@@ -77,4 +77,4 @@ if __name__ == '__main__':
 
     Screen.wrapper(launcher.go)
 
-    app_config.save_config(config)
+    app_config.save_config(config, skip_write = False)
