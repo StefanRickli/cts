@@ -13,8 +13,13 @@ import app_config
 config = {}
 
 def pre_gui():
+    spotify = login(config['username'])
 
-    spotify = SpotipyWrapper(config['username'])
+    return spotify
+
+
+def login(username):
+    spotify = SpotipyWrapper(username)
     
     login_succeeded = False
     while not login_succeeded:
