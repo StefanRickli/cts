@@ -122,7 +122,11 @@ class ConfigDict(collections.MutableMapping):
     def to_dict(self):
         return self.store
 
-def load_config(path = './settings.cfg'):
+def load_config(path = './settings.cfg', load_defaults = False):
+    if load_defaults:
+        logging.info('load_config: Loading defaults.')
+        return ConfigDict(default_config)
+    
     if os.path.exists(path):
         with open(path, 'r') as f:
             try:
@@ -138,7 +142,11 @@ def load_config(path = './settings.cfg'):
 
     return ConfigDict(default_config)
 
-def save_config(config, path = './settings.cfg'):
+def save_config(config, path = './settings.cfg', skip = False):
+    if skip:
+        logging.info('save_config: Skip requested.')
+        return
+    
     try:
         with open(path, 'w') as f:
             yaml.dump(config.to_dict(), f, default_flow_style = False)
