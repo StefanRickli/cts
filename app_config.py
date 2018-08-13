@@ -141,7 +141,7 @@ def get_config(path = './settings.cfg'):
 def save_config(config, path = './settings.cfg'):
     try:
         with open(path, 'w') as f:
-            yaml.dump(confi.to_dict()g, f, default_flow_style = False)
+            yaml.dump(config.to_dict(), f, default_flow_style = False)
             logging.debug("save_config: wrote current config to '{}'".format(path))
     except Exception as e:
         logging.warning("save_config: caught exception. Couldn't write to file '{}'".format(path))
