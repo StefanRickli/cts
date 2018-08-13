@@ -1,6 +1,6 @@
 import sys
 import os
-import json
+import yaml
 import logging
 
 #######################################################################
@@ -81,11 +81,11 @@ def get_config(path = './settings.cfg'):
     if os.path.exists(path):
         with open(path, 'r') as f:
             try:
-                config = json.load(f)
+                config = ConfigDict(yaml.load(f))
                 logging.debug("get_config: restored saved config from '{}'".format(path))
                 return config
-            except json.JSONDecodeError as e:
-                logging.warning('get_config: JSON.load encountered a decoding error:')
+            except yaml.YAMLError as e:
+                logging.warning('get_config: yaml.load encountered a decoding error:')
                 logging.warning(str(e))
                 logging.warning('get_config: Loading defaults.')
     else:
@@ -96,7 +96,7 @@ def get_config(path = './settings.cfg'):
 def save_config(config, path = './settings.cfg'):
     try:
         with open(path, 'w') as f:
-            json.dump(config, f)
+            yaml.dump(config, f, default_flow_style = False)
             logging.debug("save_config: wrote current config to '{}'".format(path))
     except Exception as e:
         logging.warning("save_config: caught exception. Couldn't write to file '{}'".format(path))
