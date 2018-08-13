@@ -2,6 +2,7 @@ import sys
 import os
 import yaml
 import logging
+import collections
 
 #######################################################################
 
@@ -77,6 +78,43 @@ default_config = {
 }
 
 
+# https://stackoverflow.com/questions/3387691/how-to-perfectly-override-a-dict
+class ConfigDict(collections.MutableMapping):
+    """A dictionary that applies an arbitrary key-altering
+       function before accessing the keys"""
+
+    def __init__(self, *args, **kwargs):
+        self.store = dict()
+        self.update(dict(*args, **kwargs))  # use the free update to set keys
+
+    # This implementation first tries to get the value of a missing key from
+    # the default configuration before raising a KeyError
+    def __getitem__(self, key):
+        result = None
+        try:
+            result = self.store[key]
+        except KeyError:
+            logging.warning("ConfigDict: key '{}' not found, trying to get value from default config.".format(key))
+            self.store[key] = default_config[key]
+            result = self.store[key]
+            logging.warning("ConfigDict: '{}' default: {}".format(key, str(result)))
+        return result
+
+    def __setitem__(self, key, value):
+        self.store[key] = value
+
+    def __delitem__(self, key):
+        del self.store[key]
+
+    def __iter__(self):
+        return iter(self.store)
+
+    def __len__(self):
+        return len(self.store)
+    
+    def to_dict(self):
+        return self.store
+
 def get_config(path = './settings.cfg'):
     if os.path.exists(path):
         with open(path, 'r') as f:
@@ -91,12 +129,12 @@ def get_config(path = './settings.cfg'):
     else:
         logging.warning("get_config: settings file didn't exist at path '{}'. Loading defaults.".format(path))
 
-    return default_config
+    return ConfigDict(default_config)
 
 def save_config(config, path = './settings.cfg'):
     try:
         with open(path, 'w') as f:
-            yaml.dump(config, f, default_flow_style = False)
+            yaml.dump(confi.to_dict()g, f, default_flow_style = False)
             logging.debug("save_config: wrote current config to '{}'".format(path))
     except Exception as e:
         logging.warning("save_config: caught exception. Couldn't write to file '{}'".format(path))
