@@ -131,14 +131,14 @@ def load_config(path = './settings.cfg', load_defaults = False):
         with open(path, 'r') as f:
             try:
                 config = ConfigDict(yaml.load(f))
-                logging.debug("get_config: restored saved config from '{}'".format(path))
+                logging.debug("load_config: restored saved config from '{}'".format(path))
                 return config
             except yaml.YAMLError as e:
-                logging.warning('get_config: yaml.load encountered a decoding error:')
+                logging.warning('load_config: yaml.load encountered a decoding error:')
                 logging.warning(str(e))
-                logging.warning('get_config: Loading defaults.')
+                logging.warning('load_config: Loading defaults.')
     else:
-        logging.warning("get_config: settings file didn't exist at path '{}'. Loading defaults.".format(path))
+        logging.warning("load_config: settings file didn't exist at path '{}'. Loading defaults.".format(path))
 
     return ConfigDict(default_config)
 
